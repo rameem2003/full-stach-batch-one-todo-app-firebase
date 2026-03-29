@@ -1,12 +1,50 @@
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { loginScgema } from "../validator/userauth.schema";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase.config";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
+import { useState } from "react";
 
 const Login = () => {
+  const [toggle, setToggle] = useState(false);
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginScgema),
+  });
+
+  const loginRequest = (data) => {
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        toast.success("Authentication Success");
+
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // console.log(errorMessage);
+        toast.error(errorMessage);
+      });
+  };
+
   return (
     <div className="min-h-screen flex fle-col items-center justify-center">
       <div className="py-6 px-4">
         <div className="grid lg:grid-cols-2 items-center gap-6 max-w-6xl w-full">
           <div className="border border-slate-300 rounded-lg p-6 max-w-md shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)] max-lg:mx-auto">
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit(loginRequest)} className="space-y-6">
               <div className="mb-12">
                 <h1 className="text-slate-900 text-3xl font-semibold">
                   Sign in
@@ -22,6 +60,7 @@ const Login = () => {
                 </label>
                 <div className="relative flex items-center">
                   <input
+                    {...register("email")}
                     name="email"
                     type="email"
                     required=""
@@ -49,6 +88,7 @@ const Login = () => {
                 </label>
                 <div className="relative flex items-center">
                   <input
+                    {...register("password")}
                     name="password"
                     type="password"
                     required=""
@@ -95,7 +135,7 @@ const Login = () => {
               </div>
               <div className="!mt-12">
                 <button
-                  type="button"
+                  type="submit"
                   className="w-full shadow-xl py-2.5 px-4 text-[15px] font-medium tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none cursor-pointer"
                 >
                   Sign in
