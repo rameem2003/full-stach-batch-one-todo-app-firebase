@@ -2,45 +2,35 @@ import { onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { auth } from "../config/firebase.config";
 import { useLocation, useNavigate } from "react-router";
+import { useAuth } from "../hook/useAuth";
 
 const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isLoggedin, setIsLoggedin] = useState(null);
-  const [loading, setLoading] = useState(false);
+
   const getUserInfo = () => {
-    setLoading(true);
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setLoading(false);
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
-        const uid = user.uid;
-        // console.log(user);
-        if (location.pathname == "/login") {
-          navigate("/");
-        } else if (location.pathname == "/register") {
-          navigate("/");
-        }
-
-        // ...
-      } else {
-        console.log("ok");
-
-        setLoading(false);
-        if (location.pathname == "/") {
-          navigate("/login");
-          return;
-        }
-        // User is signed out
-        // ...
+    if (user) {
+      if (location.pathname == "/login") {
+        navigate("/");
+      } else if (location.pathname == "/register") {
+        navigate("/");
       }
-    });
+
+      // ...
+    } else {
+      if (location.pathname == "/") {
+        navigate("/login");
+        return;
+      }
+      // User is signed out
+      // ...
+    }
   };
 
   useEffect(() => {
     getUserInfo();
-  }, []);
+  }, [user, loading]);
 
   if (loading) {
     return (
