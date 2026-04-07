@@ -24,6 +24,7 @@ const Login = () => {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
+
         toast.success("Authentication Success");
 
         setTimeout(() => {
