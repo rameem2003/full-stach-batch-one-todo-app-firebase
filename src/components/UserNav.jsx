@@ -1,17 +1,18 @@
-import React from "react";
-import { useAuth } from "../hook/useAuth";
+import React, { useContext } from "react";
+import { UserContext } from "../hook/useAuth";
 import { useNavigate } from "react-router";
+import { signOut } from "firebase/auth";
+import { auth } from "../config/firebase.config";
 
 const UserNav = () => {
   const navigate = useNavigate();
-  const { user, userSignOut } = useAuth();
+  const { user } = useContext(UserContext);
 
   const handleSignout = async () => {
     console.log("Ok");
 
-    await userSignOut();
+    await signOut(auth);
     navigate("/login");
-    window.location.reload();
   };
 
   return (

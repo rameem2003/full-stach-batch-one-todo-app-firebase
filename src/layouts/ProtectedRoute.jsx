@@ -1,36 +1,24 @@
-import { onAuthStateChanged } from "firebase/auth";
-import React, { useEffect, useState } from "react";
-import { auth } from "../config/firebase.config";
+import React, { useContext } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { useAuth } from "../hook/useAuth";
+import { UserContext } from "../hook/useAuth";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const getUserInfo = () => {
-    if (user) {
-      if (location.pathname == "/login") {
-        navigate("/");
-      } else if (location.pathname == "/register") {
-        navigate("/");
-      }
-
-      // ...
-    } else {
-      if (location.pathname == "/") {
-        navigate("/login");
-        return;
-      }
-      // User is signed out
-      // ...
+  if (user) {
+    if (location.pathname == "/login") {
+      navigate("/");
+    } else if (location.pathname == "/register") {
+      navigate("/");
     }
-  };
-
-  useEffect(() => {
-    getUserInfo();
-  }, [user, loading]);
+  } else {
+    if (location.pathname == "/") {
+      navigate("/login");
+      return;
+    }
+  }
 
   if (loading) {
     return (
