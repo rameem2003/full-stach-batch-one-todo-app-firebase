@@ -11,6 +11,8 @@ export const UserContextProvider = ({ children }) => {
   useEffect(() => {
     const sub = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log(user);
+
         setUser(user);
         setLoading(false);
       } else {
